@@ -1,0 +1,58 @@
+[
+    {
+        "id": 1,
+        "invoice_id": 1,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-02 12:01:44",
+        "status": "created"
+    },
+    {
+        "id": 2,
+        "invoice_id": 2,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-02 13:34:07",
+        "status": "created"
+    },
+    {
+        "id": 3,
+        "invoice_id": 3,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-02 13:34:22",
+        "status": "created"
+    },
+    {
+        "id": 4,
+        "invoice_id": 4,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-02 13:51:10",
+        "status": "created"
+    },
+    {
+        "id": 5,
+        "invoice_id": 5,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-02 13:53:42",
+        "status": "created"
+    },
+    {
+        "id": 6,
+        "invoice_id": 6,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-04 08:37:35",
+        "status": "created"
+    },
+    {
+        "id": 7,
+        "invoice_id": 7,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-04 08:39:01",
+        "status": "created"
+    },
+    {
+        "id": 8,
+        "invoice_id": 8,
+        "response": "Invoice generated successfully",
+        "sent_at": "2025-11-04 09:03:05",
+        "status": "created"
+    }
+]

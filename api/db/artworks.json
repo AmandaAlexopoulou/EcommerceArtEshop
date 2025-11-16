@@ -1,0 +1,44 @@
+[
+    {
+        "description": "pen in paper",
+        "id": 1,
+        "image": "face.jpg",
+        "price": 120.0,
+        "title": "Landscape1"
+    },
+    {
+        "description": "pen in paper",
+        "id": 2,
+        "image": "firebird.jpg",
+        "price": 112.0,
+        "title": "Portrait1"
+    },
+    {
+        "description": "pencil in paper",
+        "id": 3,
+        "image": "HamletWithSkull.jpg",
+        "price": 112.0,
+        "title": "Portrait2"
+    },
+    {
+        "description": "pen,posca and pencil in paper",
+        "id": 4,
+        "image": "mermaids.jpg",
+        "price": 110.0,
+        "title": "Abstract1"
+    },
+    {
+        "description": "pencil on paper",
+        "id": 5,
+        "image": "monster.jpg",
+        "price": 100.0,
+        "title": "Axis Mundi"
+    },
+    {
+        "description": "marker and pencil in paper",
+        "id": 6,
+        "image": "poseidon.jpg",
+        "price": 120.0,
+        "title": "Room in the evenung"
+    }
+]

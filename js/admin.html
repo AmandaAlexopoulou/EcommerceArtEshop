@@ -9,24 +9,32 @@
 <body>
   <header>
     <h1>Πάνελ Διαχείρισης Έργων</h1>
+    <nav>
+        <!--Συνδέσεις προς τη διαχείριση έργων και τα παραστατικά (admin_invoices.php)-->
+        <a href="admin.html">🎨 Διαχείριση Έργων</a> |
+        <a href="../admin_invoices.php">📄 Παραστατικά</a>
+    </nav>
   </header>
 
   <main class="admin-panel">
     <section class="form-section">
       <h2>Προσθήκη / Επεξεργασία Έργου</h2>
-      <form id="artwork-form">
-        <input type="hidden" id="artwork-id">
-        <input type="text" id="title" placeholder="Τίτλος" required>
-        <input type="text" id="image" placeholder="URL Εικόνας" required>
-        <input type="number" id="price" placeholder="Τιμή (€)" required>
-        <button type="submit">Αποθήκευση</button>
+      <form id="artwork-form"><!-- Φόρμα προσθήκης ή επεξεργασίας έργου (τίτλος, τιμή, εικόνα) -->
+          <input type="file" id="imageFile" accept="image/*"><!-- Επιλογή αρχείου εικόνας για upload-->
+          <input type="text" id="image" placeholder="Όνομα αρχείου εικόνας" readonly required>
+
+          <input type="hidden" id="artwork-id">
+          <input type="text" id="title" placeholder="Τίτλος" required>
+          <input type="number" id="price" placeholder="Τιμή (€)" required>
+
+          <button type="submit">Αποθήκευση</button>
       </form>
     </section>
 
     <section class="list-section">
       <h2>Λίστα Έργων</h2>
-      <div id="artwork-list" class="artwork-grid admin-view">
-        <!-- Τα έργα θα φορτωθούν εδώ -->
+      <div id="artwork-list" class="artwork-grid admin-view"><!--Περιοχή όπου εμφανίζονται όλα τα έργα που έχουν εισαχθεί στη βάση.-->
+          <!-- Τα έργα θα φορτωθούν εδώ -->
       </div>
     </section>
   </main>

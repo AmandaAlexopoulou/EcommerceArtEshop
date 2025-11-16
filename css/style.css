@@ -1,46 +1,223 @@
 /* Admin panel */
+/*main container for the admin panel**/
 .admin-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    padding: 20px;
+    display: flex; /*Arranges child elements vertically**/
+    flex-direction: column; /*Adds space between child elements**/
+    gap: 40px;/**Adds space inside the container*/
+    padding: 20px;/**Centers the panel and limits its width*/
     max-width: 1000px;
     margin: auto;
 }
 
+/*
+    sections for:
+
+Adding/editing data (form-section)
+
+Viewing entries (list-section)
+
+background: #f9f9f9;: Light gray background.
+
+padding: 20px;: Inner spacing.
+
+border-radius: 8px;: Rounded corners
+    
+    **/
 .form-section, .list-section {
     background: #f9f9f9;
     padding: 20px;
     border-radius: 8px;
 }
 
+/**Applies consistent styling to form elements*/
+
 form input, form button {
+    /*Makes elements full-width and evenly spaced*/
     padding: 10px;
     margin: 5px 0;
     width: 100%;
+    /*Ensures padding and borders are included in the total width*/
     box-sizing: border-box;
 }
 
 form button {
-    background-color: #007BFF;
+    background-color: #007BFF; /*Blue background (#007BFF) with white text*/
     color: white;
-    border: none;
+    border: none; /*No border, bold text, and cursor changes on hover*/
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s; /*Smooth hover effect*/
 }
 
-form button:hover {
-    background-color: #0056b3;
-}
+    form button:hover {
+        background-color: #0056b3; /*On hover: background changes to darker blue (#0056b3)*/
+    }
 
 .admin-view .artwork {
-    position: relative;
+    position: relative; /*Likely allows positioning of elements like buttons or overlays on top of artwork*/
 }
+/*Buttons used within the admin view (e.g., edit/delete).
 
+Small padding and margin.
+
+Font size: 14px.
+
+Cursor changes to pointer on hover.*/
 .admin-view button {
     margin: 5px 2px;
     padding: 5px 10px;
     font-size: 14px;
     cursor: pointer;
 }
+
+/* ----------------------------------------------------
+   Artworks styling for the front-end (index.html, etc.)
+----------------------------------------------------- */
+
+.artwork-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.artwork {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .artwork:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .artwork img {
+        width: 100%;
+        max-height: 250px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .artwork h3 {
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
+        color: #2a2a72;
+    }
+
+    .artwork p {
+        margin: 0.4rem 0;
+        color: #555;
+    }
+
+    .artwork button {
+        background-color: #2a2a72;
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-top: 1rem;
+    }
+
+        .artwork button:hover {
+            background-color: #1a1a4d;
+        }
+
+/* ===== Checkout Page Styling ===== */
+body {
+    background: #fdfdfd;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #2a2a72;
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+main.checkout-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.checkout-form h2 {
+    color: #2a2a72;
+    margin-top: 1.5rem;
+}
+
+.checkout-form label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+.checkout-form input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.cart-items {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+    .cart-items li {
+        background: #f1f1f1;
+        padding: 0.8rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+    }
+
+.total {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+    text-align: right;
+    color: #000;
+}
+
+.submit-btn {
+    margin-top: 2rem;
+    background-color: #2a2a72;
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+    .submit-btn:hover {
+        background-color: #1a1a4d;
+    }
+
+footer {
+    text-align: center;
+    background: #2a2a72;
+    color: white;
+    padding: 1rem 0;
+    margin-top: 3rem;
+}
+
+

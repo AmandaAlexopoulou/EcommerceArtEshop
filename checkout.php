@@ -1,34 +1,17 @@
-<--!<?php
-// checkout.php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $items = $_POST['items']; // JSON array
-    $total = $_POST['total'];
-
-    $db = new PDO('sqlite:db/database.sqlite');
-    $stmt = $db->prepare("INSERT INTO orders (customer_name, customer_email, items, total) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$name, $email, $items, $total]);
-
-    $order_id = $db->lastInsertId();
-
-    // Στείλε παραστατικό
-    $cmd = shell_exec("curl -X POST -H 'Content-Type: application/json' -d '{\"order_id\":$order_id}' http://localhost/api/send_invoice.php");
-
-    echo "Η παραγγελία καταχωρήθηκε και το παραστατικό στάλθηκε!";
-}--//->
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ολοκλήρωση Παραγγελίας</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
+    <nav>
+        <a href="cart.html">🛒 Το καλάθι μου (<span id="cart-count">0</span>)</a>
+    </nav>
     <h1>Ολοκλήρωση Παραγγελίας</h1>
 </header>
 
@@ -42,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <h3>Προϊόντα στο καλάθι:</h3>
         <ul id="cart-items"></ul>
-        <p>Συνολικό ποσό: €<span id="total"></span></p>
+        <p>Συνολικό ποσό: €<span id="total">0.00</span></p>
 
         <button type="submit">Ολοκλήρωση Παραγγελίας</button>
     </form>
@@ -52,48 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <p>&copy; 2025 eShop Ζωγραφικών Έργων</p>
 </footer>
 
-<script src="js/cart.js"></script>
-<script>
-    // Ανάκτηση καλαθιού από το localStorage και εμφάνιση
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartItemsList = document.getElementById('cart-items');
-    const totalElement = document.getElementById('total');
-    let total = 0;
-
-    cart.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.title} - €${item.price.toFixed(2)} x ${item.quantity}`;
-        cartItemsList.appendChild(li);
-        total += item.price * item.quantity;
-    });
-
-    totalElement.textContent = total.toFixed(2);
-
-    // Αποστολή της παραγγελίας
-    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const items = JSON.stringify(cart);
-        
-        const response = await fetch('checkout.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `name=${name}&email=${email}&items=${items}&total=${total}`
-        });
-
-        if (response.ok) {
-            alert('Η παραγγελία ολοκληρώθηκε επιτυχώς!');
-            localStorage.removeItem('cart');
-            window.location.href = 'index.html';
-        } else {
-            alert('Κάτι πήγε στραβά με την παραγγελία σας.');
-        }
-    });
-</script>
+<!-- JS SCRIPTS -->
+<script src="js/public.js"></script>
+<script src="js/checkout.js"></script>
 
 </body>
 </html>
