@@ -1,20 +1,25 @@
 <?php
+// Include the database connection
 require_once 'db.php';
 
-// Έλεγχος παραμέτρου id
+// Check if 'id' parameter exists and is a number
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    die("Μη έγκυρο αναγνωριστικό προϊόντος.");
+    die("Invalid product ID.");
 }
 
+// Cast 'id' to integer to prevent injection
 $id = (int)$_GET['id'];
 
-// Προετοιμασμένο query για αποφυγή SQL injection
+// Prepare SQL query to prevent SQL injection
 $stmt = $db->prepare("SELECT * FROM artworks WHERE id = ?");
 $stmt->execute([$id]);
+
+// Fetch the product as an associative array
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Check if the product exists
 if (!$product) {
-    die("<p>Το προϊόν δεν βρέθηκε.</p>");
+    die("<p>Product not found.</p>");
 }
 ?>
 
@@ -28,29 +33,33 @@ if (!$product) {
 </head>
 <body>
 <header>
-    <h1>eShop Ζωγραφικών Έργων</h1>
+    <h1>eShop Artworks</h1>
     <nav>
-        <a href="index.html">🏠 Αρχική</a>
-        <a href="cart.html">🛒 Καλάθι</a>
+        <a href="index.html">🏠 Home</a>
+        <a href="cart.html">🛒 Cart</a>
     </nav>
 </header>
 
 <main style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
     <h2><?= htmlspecialchars($product['title']) ?></h2>
 
+    <!-- Product image -->
     <img src="img/artworks/<?= htmlspecialchars($product['image']) ?>" 
          alt="<?= htmlspecialchars($product['title']) ?>" 
          style="max-width: 100%; border-radius: 10px;">
 
+    <!-- Product description -->
     <p style="margin-top: 1rem;"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
 
-    <p><strong>Τιμή:</strong> €<?= number_format($product['price'], 2) ?></p>
+    <!-- Product price -->
+    <p><strong>Price:</strong> €<?= number_format($product['price'], 2) ?></p>
 
+    <!-- Add to cart button with data attributes -->
     <button id="add-to-cart" 
             data-id="<?= htmlspecialchars($product['id']) ?>" 
             data-title="<?= htmlspecialchars($product['title']) ?>" 
             data-price="<?= htmlspecialchars($product['price']) ?>">
-        ➕ Προσθήκη στο καλάθι
+        ➕ Add to cart
     </button>
 </main>
 
@@ -59,24 +68,30 @@ if (!$product) {
 </footer>
 
 <script>
-// Προσθήκη στο καλάθι (LocalStorage)
+// Add product to cart using LocalStorage
 document.getElementById('add-to-cart').addEventListener('click', function() {
     const id = this.dataset.id;
     const title = this.dataset.title;
     const price = parseFloat(this.dataset.price);
 
+    // Retrieve existing cart or initialize a new array
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Αν υπάρχει ήδη, αύξησε την ποσότητα
+    // Check if product already exists in cart
     const existing = cart.find(item => item.id == id);
     if (existing) {
+        // Increase quantity if already exists
         existing.quantity += 1;
     } else {
+        // Add new product to cart
         cart.push({ id, title, price, quantity: 1 });
     }
 
+    // Save updated cart to LocalStorage
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert(`Το έργο "${title}" προστέθηκε στο καλάθι!`);
+
+    // Notify user
+    alert(`Product "${title}" has been added to your cart!`);
 });
 </script>
 
