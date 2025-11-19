@@ -31,3 +31,20 @@ MailHog*
 
 # Ignore local configs
 *.log
+
+# Ignore SQLite databases
+*.sqlite
+api/db/*.sqlite
+
+# Ignore executables
+*.exe
+
+# Ignore images
+img/
+api/db/*.png
+
+# Ignore vendor folder
+vendor/
+
+
+
