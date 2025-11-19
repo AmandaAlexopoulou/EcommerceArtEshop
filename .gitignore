@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# PHP dependencies (if using Composer)
+vendor/
+
+# Node dependencies (if any)
+node_modules/
+
+# Database files
+*.sqlite
+api/db/*.sqlite
+
+# Local tools/executables
+*.exe
+MailHog*
+
+# Environment / secrets
+.env
+
+# Images (ignore common formats)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
+*.svg
+
+
+# Ignore local configs
+*.log
