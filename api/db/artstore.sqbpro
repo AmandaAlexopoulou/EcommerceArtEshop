@@ -1,9 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="artstore.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="browser structure pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2657"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="orders" custom_title="0" dock_id="1" table="4,6:mainorders"/><dock_state state="000000ff00000000fd00000001000000020000043c000002b6fc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000043c0000011800ffffff000002580000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="artworks" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="156"/><column index="3" value="234"/><column index="4" value="46"/><column index="5" value="42"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="orders" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="163"/><column index="3" value="195"/><column index="4" value="39"/><column index="5" value="46"/><column index="6" value="156"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">CREATE TABLE IF NOT EXISTS orders (
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="artstore.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="browser structure pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="3157"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="users" custom_title="0" dock_id="1" table="4,5:mainusers"/><dock_state state="000000ff00000000fd00000001000000020000043c000002b6fc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000043c0000011800ffffff000002580000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="artworks" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="241"/><column index="3" value="300"/><column index="4" value="46"/><column index="5" value="202"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="customers" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="163"/><column index="3" value="195"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="roles" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="70"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="sqlite_sequence" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="101"/><column index="2" value="31"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="users" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort><column index="0" mode="0"/></sort><column_widths><column index="1" value="29"/><column index="2" value="63"/><column index="3" value="39"/><column index="4" value="62"/><column index="5" value="79"/><column index="6" value="49"/><column index="7" value="68"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- 1. Δημιουργία νέου πίνακα με UNIQUE για το email
+--CREATE TABLE IF NOT EXISTS customers_new (
+--    id INTEGER PRIMARY KEY AUTOINCREMENT,
+--    name TEXT NOT NULL,
+--    email TEXT UNIQUE NOT NULL
+--);
+
+-- 2. Αντιγραφή δεδομένων από τον παλιό πίνακα στον νέο
+--INSERT INTO customers_new (id, name, email)
+--SELECT id, name, email FROM customers;
+
+-- 3. Διαγραφή του παλιού πίνακα
+--DROP TABLE customers;
+
+-- 4. Μετονομασία του νέου πίνακα
+--ALTER TABLE customers_new RENAME TO customers;
+
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_name TEXT NOT NULL,
-    customer_email TEXT NOT NULL,
-    items TEXT NOT NULL, -- JSON string
-    total REAL NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    customer_id INTEGER NOT NULL,    -- Αναφορά στον πίνακα customers
+    role_id INTEGER NOT NULL,        -- Αναφορά στον πίνακα roles
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE CASCADE,  -- Σύνδεση με πελάτες
+    FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE           -- Σύνδεση με ρόλους
 );
+CREATE TABLE IF NOT EXISTS roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role_name TEXT UNIQUE NOT NULL
+);
+
+INSERT OR IGNORE INTO roles (role_name) VALUES
+('admin'),
+('customer');
 </sql><current_tab id="0"/></tab_sql></sqlb_project>
