@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/api/db.php';
+
 // Connect to the SQLite database (fixed incorrect database filename)
 $db = new PDO('sqlite:db/artstore.sqlite');
 
@@ -7,6 +9,8 @@ $invoices = $db->query("SELECT * FROM invoices ORDER BY id DESC")->fetchAll(PDO:
 
 // Retrieve invoice summary statistics (total invoices, sent, pending, total sales)
 $stats = $db->query("SELECT * FROM invoices_summary")->fetch(PDO::FETCH_ASSOC);
+//for debugging 
+echo "DB file: " . $db->query("PRAGMA database_list")->fetchColumn(2);
 
 ?>
 
