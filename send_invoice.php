@@ -1,23 +1,34 @@
-<?php 
-// Load the database connection
-require_once 'db.php';
+<?php
+// ===== DEBUG =====
+// Καταγραφή έναρξης εκτέλεσης του script για debugging
+// Η πληροφορία γράφεται στο αρχείο debug.txt στο root του project
+file_put_contents(__DIR__ . "/debug.txt", "RUNNING SEND_INVOICE\n", FILE_APPEND);
 
-// Use PHPMailer namespaces
+// Φόρτωση σύνδεσης με τη βάση δεδομένων
+// Το db.php περιέχει τον PDO connection στον SQLite πίνακα
+require_once __DIR__ . '/api/db.php';
+
+// Χρήση των namespaces της PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Load PHPMailer classes
-require 'phpmailer/src/Exception.php';
-require 'phpmailer/src/PHPMailer.php';
-require 'phpmailer/src/SMTP.php';
+// Καθορισμός των paths των αρχείων της PHPMailer
+// Πρέπει να υπάρχουν στον φάκελο phpmailer/src
+require __DIR__ . '/phpmailer/src/Exception.php';
+require __DIR__ . '/phpmailer/src/PHPMailer.php';
+require __DIR__ . '/phpmailer/src/SMTP.php';
 
-// Get JSON input from the request body
+// Ανάγνωση δεδομένων JSON που στέλνονται στο script μέσω POST
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Retrieve the invoice ID from JSON or default to 0
+// Λήψη του invoice ID από τα δεδομένα
+// Αν δεν υπάρχει, το id γίνεται 0
 $id = $data['id'] ?? 0;
 
-// Prepare SQL to fetch the invoice and customer details
+// Καταγραφή του invoice ID στο debug αρχείο
+file_put_contents(__DIR__ . "/debug.txt", "INVOICE ID = $id\n", FILE_APPEND);
+
+// Εκτέλεση query για λήψη στοιχείων του παραστατικού και του πελάτη
 $stmt = $db->prepare("
     SELECT invoices.*, customers.name AS customer_name, customers.email AS customer_email
     FROM invoices
@@ -25,35 +36,37 @@ $stmt = $db->prepare("
     JOIN customers ON orders.customer_id = customers.id
     WHERE invoices.id = ?
 ");
-
-// Execute the query with the given ID
 $stmt->execute([$id]);
-
-// Fetch the result as an associative array
 $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Check if the invoice exists
+// Αν το invoice δεν βρεθεί, γράφεται στο debug αρχείο και επιστρέφεται error 404
 if (!$invoice) {
+    file_put_contents(__DIR__ . "/debug.txt", "INVOICE NOT FOUND\n", FILE_APPEND);
     http_response_code(404);
-    echo "Invoice not found.";
+    echo json_encode(["error" => "Invoice not found"]);
     exit;
 }
 
-// Create a new PHPMailer instance
+// Δημιουργία αντικειμένου PHPMailer
 $mail = new PHPMailer(true);
 
-try {
-    // SMTP settings
-    $mail->isSMTP();
-    $mail->Host = 'localhost';      // SMTP server (MailHog)
-    $mail->Port = 1025;             // MailHog port
-    $mail->SMTPAuth = false;        // No authentication for local testing
+// Αποθήκευση της τρέχουσας ημερομηνίας/ώρας για log
+$now = date("Y-m-d H:i:s");
 
-    // Set sender and recipient
+try {
+    // Ρύθμιση SMTP για αποστολή μέσω localhost (π.χ. MailHog)
+    $mail->isSMTP();
+    $mail->Host = 'localhost';
+    $mail->Port = 1025;
+    $mail->SMTPAuth = false;
+
+    // Καθορισμός αποστολέα
     $mail->setFrom('no-reply@arteshop.local', 'ArtEshop');
+
+    // Προσθήκη παραλήπτη από στοιχεία του invoice
     $mail->addAddress($invoice['customer_email'], $invoice['customer_name']);
 
-    // Email content settings
+    // Email σε HTML μορφή
     $mail->isHTML(true);
     $mail->Subject = "Invoice #" . $invoice['invoice_number'];
     $mail->Body = "
@@ -63,22 +76,35 @@ try {
         <p>Total: €" . number_format($invoice['total'], 2) . "</p>
     ";
 
-    // Send the email
+    // Αποστολή email
     $mail->send();
+    $status = 'sent';
+    $response = 'Email sent successfully';
 
-    // Update the database that the invoice has been sent
-    $db->prepare("UPDATE invoices SET status='sent', timestamp_sent=datetime('now') WHERE id=?")
-       ->execute([$id]);
-
-    // Log the email sending
-    $db->prepare("INSERT INTO invoice_logs (invoice_id, sent_at, status, response) VALUES (?, datetime('now'), ?, ?)")
-       ->execute([$id, 'sent', 'Email sent successfully']);
-
-    // Success message
-    echo "✅ Email sent successfully (MailHog).";
+    // Ενημέρωση του invoice στον πίνακα invoices για να σημειωθεί ως "sent"
+    $db->prepare("UPDATE invoices SET status='sent', timestamp_sent=? WHERE id=?")
+       ->execute([$now, $id]);
 
 } catch (Exception $e) {
-    // Handle errors and show message
-    echo "❌ Error: {$mail->ErrorInfo}";
+    // Σε περίπτωση λάθους καταγράφεται το σφάλμα
+    $status = 'error';
+    $response = $mail->ErrorInfo;
 }
+
+// Καταγραφή της αποστολής ή του σφάλματος στον πίνακα invoice_logs
+$stmt = $db->prepare("
+    INSERT INTO invoice_logs (invoice_id, sent_at, status, response)
+    VALUES (?, ?, ?, ?)
+");
+$stmt->execute([$id, $now, $status, $response]);
+
+// Καταγραφή στο debug.txt για να βλέπουμε ότι η εγγραφή έγινε
+file_put_contents(__DIR__ . "/debug.txt", "LOG INSERTED: ID=$id STATUS=$status\n", FILE_APPEND);
+
+// Επιστροφή JSON response με αποτέλεσμα αποστολής
+echo json_encode([
+    "success" => $status === 'sent',
+    "message" => $response,
+    "invoice_id" => $id
+]);
 ?>
