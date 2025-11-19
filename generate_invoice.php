@@ -1,6 +1,7 @@
 <?php
 // Include necessary files and classes
-require_once 'db.php';
+require_once __DIR__ . '/api/db.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
