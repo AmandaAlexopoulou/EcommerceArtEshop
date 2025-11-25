@@ -1,0 +1,722 @@
+Database Documentation – ArtEshop
+
+Αυτό είναι ένα πλήρες database documentation για τη βάση. Περιγράφει όλους τους πίνακες, τα πεδία τους, τους τύπους,
+ τις σχέσεις και τη χρήση τους.
+
+
+
+ 1. `customers`
+
+Πίνακας πελατών.
+
+| Πεδίο | Τύπος   | Not Null | Extra / Σχόλια       |
+| ----- | ------- | -------- | -------------------- |
+| id    | INTEGER | Ναι      | Primary Key          |
+| name  | TEXT    | Ναι      | Όνομα πελάτη         |
+| email | TEXT    | Ναι      | Unique, email πελάτη |
+
+Σκοπός: Αποθήκευση στοιχείων πελατών.
+
+---
+
+2. `roles`
+
+Πίνακας ρόλων χρηστών.
+
+| Πεδίο     | Τύπος   | Not Null | Extra / Σχόλια                         |
+| --------- | ------- | -------- | -------------------------------------- |
+| id        | INTEGER | Ναι      | Primary Key                            |
+| role_name | TEXT    | Ναι      | Unique, όνομα ρόλου (π.χ. admin, user) |
+
+Σκοπός: Διαχείριση ρόλων χρηστών για permissions.
+
+---
+
+ 3. `users`
+
+Πίνακας χρηστών.
+
+| Πεδίο       | Τύπος    | Not Null | Extra / Σχόλια            |
+| ----------- | -------- | -------- | ------------------------- |
+| id          | INTEGER  | Ναι      | Primary Key               |
+| username    | TEXT     | Ναι      | Unique                    |
+| email       | TEXT     | Ναι      | Unique                    |
+| password    | TEXT     | Ναι      | Αποθηκεύεται hashed       |
+| customer_id | INTEGER  | Ναι      | FK προς `customers(id)`   |
+| role_id     | INTEGER  | Ναι      | FK προς `roles(id)`       |
+| created_at  | DATETIME | Όχι      | Default CURRENT_TIMESTAMP |
+
+Σκοπός: Χρήστες του συστήματος και σύνδεσή τους με πελάτες και ρόλους.
+
+Σχέσεις:
+
+ `customer_id` → `customers.id`
+`role_id` → `roles.id`
+
+---
+
+4. `artworks`
+
+Πίνακας έργων τέχνης.
+
+| Πεδίο       | Τύπος   | Not Null | Extra / Σχόλια        |
+| ----------- | ------- | -------- | --------------------- |
+| id          | INTEGER | Ναι      | Primary Key           |
+| title       | TEXT    | Ναι      | Τίτλος έργου          |
+| description | TEXT    | Όχι      | Περιγραφή έργου       |
+| price       | REAL    | Όχι      | Τιμή                  |
+| image       | TEXT    | Όχι      | Όνομα αρχείου εικόνας |
+
+Σκοπός: Αποθήκευση των διαθέσιμων έργων τέχνης προς πώληση.
+
+
+
+ 5. `orders`
+
+Πίνακας παραγγελιών.
+
+| Πεδίο             | Τύπος    | Not Null | Extra / Σχόλια                      |
+| ----------------- | -------- | -------- | ----------------------------------- |
+| id                | INTEGER  | Ναι      | Primary Key                         |
+| customer_id       | INTEGER  | Ναι      | FK προς `customers(id)`             |
+| total             | REAL     | Ναι      | Συνολικό ποσό παραγγελίας           |
+| created_at        | DATETIME | Όχι      | Default CURRENT_TIMESTAMP           |
+| payment_intent_id | TEXT     | Όχι      | Αναγνωριστικό πληρωμής (Stripe κλπ) |
+
+Σκοπός: Αποθήκευση παραγγελιών που κάνουν οι πελάτες.
+
+Σχέσεις:
+
+ `customer_id` → `customers.id`
+
+
+6. `order_items`
+
+Πίνακας στοιχείων παραγγελίας.
+
+| Πεδίο      | Τύπος   | Not Null | Extra / Σχόλια         |
+| ---------- | ------- | -------- | ---------------------- |
+| id         | INTEGER | Ναι      | Primary Key            |
+| order_id   | INTEGER | Ναι      | FK προς `orders(id)`   |
+| artwork_id | INTEGER | Ναι      | FK προς `artworks(id)` |
+| quantity   | INTEGER | Όχι      | Default 1              |
+| price      | REAL    | Όχι      | Τιμή ανά τεμάχιο       |
+
+Σκοπός: Στοιχεία κάθε παραγγελίας (ποιά έργα, πόσα, τιμή).
+
+Σχέσεις:
+
+`order_id` → `orders.id`
+ `artwork_id` → `artworks.id`
+
+
+
+7. `invoices`
+
+Πίνακας τιμολογίων.
+
+| Πεδίο               | Τύπος   | Not Null | Extra / Σχόλια                          |
+| ------------------- | ------- | -------- | --------------------------------------- |
+| id                  | INTEGER | Ναι      | Primary Key                             |
+| order_id            | INTEGER | Ναι      | FK προς `orders(id)`                    |
+| invoice_number      | TEXT    | Ναι      | Αριθμός τιμολογίου                      |
+| issued_at           | TEXT    | Όχι      | Default CURRENT_TIMESTAMP               |
+| total               | REAL    | Όχι      | Συνολικό ποσό τιμολογίου                |
+| valid               | INTEGER | Όχι      | Default 1, αν το τιμολόγιο είναι έγκυρο |
+| provider_response   | TEXT    | Όχι      | Response από πάροχο (π.χ. API)          |
+| provider_invoice_id | TEXT    | Όχι      | ID τιμολογίου από πάροχο                |
+| status              | TEXT    | Όχι      | Default 'pending', κατάσταση αποστολής  |
+| timestamp_sent      | TEXT    | Όχι      | Χρόνος αποστολής email                  |
+
+Σκοπός: Αποθήκευση τιμολογίων για παραγγελίες.
+
+Σχέσεις:
+`order_id` → `orders.id`
+
+---
+
+ 8. `invoice_logs`
+
+Πίνακας logs αποστολής τιμολογίων.
+
+| Πεδίο      | Τύπος   | Not Null | Extra / Σχόλια                               |
+| ---------- | ------- | -------- | -------------------------------------------- |
+| id         | INTEGER | Ναι      | Primary Key                                  |
+| invoice_id | INTEGER | Ναι      | FK προς `invoices(id)`                       |
+| sent_at    | TEXT    | Όχι      | Χρόνος αποστολής                             |
+| status     | TEXT    | Όχι      | 'sent' ή 'error'                             |
+| response   | TEXT    | Όχι      | Αποτέλεσμα αποστολής (π.χ. μήνυμα σφάλματος) |
+
+Σκοπός: Καταγραφή κάθε αποστολής τιμολογίου με λεπτομέρειες.
+
+Σχέσεις:
+
+`invoice_id` → `invoices.id`
+
+---
+
+9. `sqlite_sequence`
+
+Πίνακας συστήματος SQLite για AUTOINCREMENT.
+
+| Πεδίο | Τύπος   |                        |
+| ----- | ------- | ---------------------- |
+| name  | TEXT    | Όνομα πίνακα           |
+| seq   | INTEGER | Τρέχουσα τιμή αυξητήρα |
+
+Σκοπός: Εσωτερική χρήση SQLite για αυτοαύξηση Primary Keys.
+
+
+Σύντομο ERD 
+
+customers
++----+-------+-------+
+| id | name  | email |
++----+-------+-------+
+     |
+     | 1-to-many
+     v
+orders
++----+-------------+-------+----------------+------------------+
+| id | customer_id | total | created_at     | payment_intent_id|
++----+-------------+-------+----------------+------------------+
+     |
+     | 1-to-many
+     v
+order_items
++----+----------+------------+----------+-------+
+| id | order_id | artwork_id | quantity | price |
++----+----------+------------+----------+-------+
+      |              |
+      | many-to-1    | many-to-1
+      v              v
+artworks         invoices
++----+-------+------------+-------+---------+---------+----------------+--------------------+--------+---------------+
+| id | title | description| price | image   | status  | issued_at      | provider_response | prov_id| timestamp_sent|
++----+-------+------------+-------+---------+---------+----------------+--------------------+--------+---------------+
+                       |
+                       | 1-to-many
+                       v
+invoice_logs
++----+------------+-------------------+--------+----------------------+
+| id | invoice_id | sent_at           | status | response             |
++----+------------+-------------------+--------+----------------------+
+
+roles
++----+-----------+
+| id | role_name |
++----+-----------+
+     |
+     | 1-to-many
+     v
+users
++----+----------+-------+----------+-------------+---------+-------------------+
+| id | username | email | password | customer_id | role_id | created_at        |
++----+----------+-------+----------+-------------+---------+-------------------+
+
+Τα βέλη δείχνουν τις σχέσεις FK → PK και όπου υπάρχει 1-to-many,
+ σημαίνει ότι ένα record στον πάνω πίνακα μπορεί να αντιστοιχεί σε πολλά record στον κάτω.
+orders.customer_id → customers.id
+
+order_items.order_id → orders.id
+
+order_items.artwork_id → artworks.id
+
+invoices.order_id → orders.id
+
+invoice_logs.invoice_id → invoices.id
+
+users.customer_id → customers.id
+
+users.role_id → roles.id
+
+
+Περιγραφή ERD & Κύριοι Πίνακες και Σχέσεις:
+
+customers
+
+Primary Key: id
+
+Σχέσεις:
+
+1:N με orders (customer_id)
+
+1:N με users (customer_id)
+
+roles
+
+Primary Key: id
+
+Σχέσεις:
+
+1:N με users (role_id)
+
+users
+
+Primary Key: id
+
+Foreign Keys: customer_id → customers.id, role_id → roles.id
+
+artworks
+
+Primary Key: id
+
+Σχέσεις:
+
+1:N με order_items (artwork_id)
+
+orders
+
+Primary Key: id
+
+Foreign Key: customer_id → customers.id
+
+Σχέσεις:
+
+1:N με order_items (order_id)
+
+1:1 ή 1:N με invoices (order_id)
+
+order_items
+
+Primary Key: id
+
+Foreign Keys: order_id → orders.id, artwork_id → artworks.id
+
+invoices
+
+Primary Key: id
+
+Foreign Key: order_id → orders.id
+
+Σχέσεις:
+
+1:N με invoice_logs (invoice_id)
+
+invoice_logs
+
+Primary Key: id
+
+Foreign Key: invoice_id → invoices.id
+
+
+
+
+
+
+Documentation — Σύστημα Παραστατικών & Αποστολής Τιμολογίων
+
+Art Eshop – Backend Invoice Workflow
+
+Το σύστημα παραστατικών αποτελείται από 4 βασικές ενότητες:
+
+Δημιουργία παραστατικού — generate_invoice.php
+
+Αποστολή παραστατικού με email (MailHog) — send_invoices.php
+
+Προβολή & διαχείριση όλων των παραστατικών — admin_invoices.php
+
+Αποστολή παραστατικού σε εξωτερικό πάροχο (ERP API) — api/send_invoice.php
+
+Κάθε αρχείο περιγράφεται αναλυτικά παρακάτω.
+
+generate_invoice.php
+Στόχος:
+
+Δημιουργεί παραγγελία, δημιουργεί παραστατικό, αποθηκεύει δεδομένα στη βάση και στέλνει email στον πελάτη.
+
+Ροή λειτουργίας
+1. Λήψη & έλεγχος δεδομένων (POST)
+
+Το script δέχεται από φόρμα:
+
+name (όνομα πελάτη)
+
+email (email πελάτη)
+
+items (JSON με προϊόντα καλαθιού)
+
+Κάνει:
+
+Sanitize
+
+Validate
+
+JSON decode
+
+Αν λείπουν δεδομένα → εμφανίζει μήνυμα λάθους.
+
+2. Διαχείριση πελάτη
+
+Ελέγχει αν υπάρχει πελάτης με το συγκεκριμένο email:
+
+Αν υπάρχει → παίρνει το customer_id
+
+Αν όχι → δημιουργεί νέο πελάτη
+
+3. Δημιουργία παραγγελίας
+
+Δημιουργεί ένα νέο order με συνολικό ποσό 0.
+
+Αποθηκεύει την ώρα (created_at).
+
+4. Καταχώριση προϊόντων παραγγελίας
+
+Για κάθε αντικείμενο του καλαθιού:
+
+Φέρνει τιμή από τον πίνακα artworks
+
+Καταχωρεί το item στον πίνακα order_items
+
+Υπολογίζει το συνολικό ποσό
+
+Τέλος → ενημερώνει το orders.total.
+
+5. Δημιουργία παραστατικού
+
+Δημιουργεί invoice:
+
+Φορμά invoice number:
+
+INV-YYYY-XXXXXX  
+
+
+Παράδειγμα: INV-2025-000014
+
+Καταχωρεί νέο invoice στον πίνακα invoices.
+
+6. Αποστολή email με PHPMailer
+
+Το σύστημα:
+
+Συνδέεται σε MailHog (local test environment)
+
+SMTP: 127.0.0.1:1025
+
+Χωρίς authentication
+
+Στέλνει email στον πελάτη με:
+
+invoice number
+
+total
+
+ημερομηνία
+
+Αν σταλεί → καταγράφει επιτυχία
+Αν αποτύχει → καταγράφει το error
+
+7. Καταγραφή στο invoice_logs
+
+Καταγράφει:
+
+invoice_id
+
+timestamp
+
+status (sent / failed)
+
+raw response
+
+8. Ανακατεύθυνση σε confirmation page
+
+Ο χρήστης μεταφέρεται στο:
+
+confirmation.php?invoice=...&date=...
+ Περιλαμβάνει επίσης
+
+HTML template για προεπισκόπηση του invoice σε browser με δυνατότητα εκτύπωσης.
+
+send_invoices.php
+Στόχος:
+
+Αποστολή υπάρχοντος παραστατικού (πχ. από admin panel) μέσω email στον πελάτη.
+ Ροή λειτουργίας
+1. Λήψη JSON από AJAX
+
+Το script περιμένει:
+
+{ "id": 15 }
+
+
+Όπου id = invoice_id.
+
+Ανάκτηση παραστατικού & δεδομένων πελάτη
+
+SQL query:
+
+invoices
+
+orders
+
+customers
+
+Επιστρέφει:
+
+invoice data
+
+όνομα πελάτη
+
+email
+
+3. Αποστολή email (MailHog)
+
+Με PHPMailer:
+
+SMTP → localhost:1025
+
+Χωρίς auth
+
+HTML email
+
+Invoice number + ποσό
+
+Ενημέρωση βάσης
+
+Μετά την επιτυχή αποστολή:
+
+status = 'sent'
+
+timestamp_sent = datetime('now')
+
+Logging
+
+Καταγράφει στο invoice_logs:
+
+invoice_id
+
+status
+
+timestamp
+
+response
+
+📌 Αποτέλεσμα
+
+Αν επιτυχία → "Email sent successfully"
+
+Αν λάθος → εμφανίζει το PHPMailer error
+
+admin_invoices.php
+Στόχος:
+Προβολή όλων των παραστατικών για διαχειριστές.
+
+Πληροφορίες που εμφανίζονται:
+
+ID
+
+Πελάτης
+
+Email
+
+Προϊόντα παραγγελίας
+
+Συνολικό ποσό
+
+Κατάσταση (sent / error)
+
+Provider Invoice ID (από εξωτερικό ERP)
+
+timestamp αποστολής
+
+Button "Προβολή" για provider response
+
+Statistics (summary info)
+
+Από view invoices_summary:
+
+Σύνολο παραστατικών
+
+Πόσα στάλθηκαν
+
+Πόσα είναι pending
+
+Σύνολο πωλήσεων
+
+ Features
+
+Στυλισμένος πίνακας
+
+Κατάσταση sent → πράσινο
+
+Κατάσταση error → κόκκινο
+
+On-click εμφάνιση provider API response
+
+api/send_invoice.php
+Στόχος:
+
+Αποστολή παραστατικού σε εξωτερικό πάροχο τιμολόγησης (ERP) μέσω API.
+
+ Ροή λειτουργίας
+1. Λήψη JSON input
+
+Περιμένει:
+
+{ "order_id": 123 }
+
+
+Αν λείπει → επιστρέφει 400.
+
+2. Ανάκτηση παραγγελίας
+
+Φέρνει order από DB.
+
+Αν δεν υπάρχει → επιστρέφει 404.
+
+3. Δημιουργία invoice payload για αποστολή στο provider
+
+Payload:
+
+{
+  "customer": { "name": "", "email": "" },
+  "items": [{ "title": "", "price": 0 }],
+  "total": 0,
+  "date": ""
+}
+
+4. Αποστολή δεδομένων με cURL
+
+To API καλείται με:
+
+POST https://api.provider.gr/invoices
+Authorization: Bearer <API_TOKEN>
+Content-Type: application/json
+
+
+Στέλνει JSON payload.
+
+5. Ανάκτηση και έλεγχος τοπικού invoice
+
+Ελέγχει ότι:
+
+υπάρχει invoice στον πίνακα invoices
+
+είναι valid = 1
+
+Αν όχι → error.
+
+6. Ανάλυση provider response
+
+Αν επιστρέψει error →
+γίνεται ενημέρωση invoice:
+
+status = error
+
+provider_response = raw provider response
+
+Log στο invoice_logs.
+
+Επιστροφή 502.
+
+7. Αν επιτυχία
+
+Λαμβάνει το provider_invoice_id
+
+Ενημερώνει το invoice:
+
+status = sent
+
+provider_invoice_id
+
+timestamp_sent
+
+provider_response (raw JSON)
+
+Καταγράφει log
+
+Επιστρέφει:
+
+{
+  "message": "Invoice sent successfully",
+  "order_id": ...,
+  "provider_invoice_id": ...
+}
+
+ Βάση Δεδομένων — Πίνακες που χρησιμοποιούνται
+customers
+
+id
+
+name
+
+email
+
+orders
+
+id
+
+customer_id
+
+total
+
+created_at
+
+order_items
+
+order_id
+
+artwork_id
+
+quantity
+
+price
+
+invoices
+
+id
+
+order_id
+
+invoice_number
+
+total
+
+status
+
+timestamp_sent
+
+provider_invoice_id
+
+provider_response
+
+valid
+
+invoice_logs
+
+invoice_id
+
+sent_at
+
+status
+
+response
+
+invoices_summary (view)
+
+Περιέχει:
+
+total_invoices
+
+sent_count
+
+pending_count
+
+total_sales
+
+ Συνολική Αρχιτεκτονική του Συστήματος Παραστατικών
+ generate_invoice.php
+        ↓ (email to customer)
+ send_invoices.php  ← admin action
+        ↓
+ admin_invoices.php (UI)
+        ↓
+ api/send_invoice.php (external ERP integration)
+
+
+Το σύστημα υποστηρίζει:
+ Δημιουργία παραστατικών
+ Αποστολή email στον πελάτη
+ Διαχείριση & ιστορικό στον admin
+ Αποστολή σε ERP πάροχο
+ Καταγραφή ενεργειών σε logs
