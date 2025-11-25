@@ -159,12 +159,13 @@ $artworks = $stmt->fetchAll();
         </section>
 
          <!-- Κουμπί για το Dashboard μόνο για admin -->
+	<?php if ($isAdmin): ?>
     <section class="form-container">
         <h2>Admin Dashboard</h2>
         <a href="dashboard.php" class="btn">Go to Dashboard</a>
     </section>
 		
-		<?php if ($isAdmin): ?>
+		
 		 <!-- Φόρμα για προσθήκη νέου έργου μόνο για admin -->
             <section class="form-container">
                 <h2>Προσθήκη Νέου Έργου</h2>
