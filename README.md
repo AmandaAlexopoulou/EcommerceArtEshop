@@ -15,10 +15,12 @@ Browse available artworks (paintings, sculptures, etc.).
 Add items to the shopping cart.
 Just by artworks
 Log in/Log out in case they have an account
+Register in case they don't have an account.
 
 Admin Capabilities: 
 Login with their unique username, email and password
-Insert new artworks with their name,title,price or delete them (they are also inserted and deleteed in the database)
+Insert new artworks with their name,title,price or delete them (which means they are also inserted and deleteed in the database).
+They can also see statistics about the orders and the e-shop's total income.
 The project also contains: 
 Checkout process with order confirmation and invoice generation.
 Invoice sent to the user after successful purchase (with PHP mailer).
